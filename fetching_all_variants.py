@@ -2,6 +2,7 @@ from flask import Flask,jsonify,request,Response
 from products_file import products, products_persist
 from os import remove
 import json
+from time import sleep
 
 app = Flask(__name__)
     
@@ -16,6 +17,7 @@ def find_product_by_id(id_product):
 
 @app.route("/<id_product>/variants",methods=['GET'])
 def get_all_variants_for_product(id_product):
+    sleep(5)
     return jsonify(find_product_by_id(id_product)['variants'])
 
 @app.route("/<id_product>/<sku_variant>",methods=['PUT'])
@@ -64,10 +66,11 @@ def update_variant(id_product,sku_variant):
             products[variants['index']]['product']['variants'][index_variant] = new_variant
             remove('products.json')
             with open('products.json','w') as json_file:
-                json.dump(products,json_file)   
+                json.dump(products,json_file)
+            sleep(5)       
             return products[variants['index']]['product']['variants'][index_variant]
         index_variant += 1 
-            
+    sleep(5)
     return Response(response='NOT FOUND',status=404) 
 
 @app.route('/reset',methods=['GET'])
@@ -75,6 +78,7 @@ def reset_products():
     remove('products.json')
     with open('products.json','w') as json_file:
         json.dump(json.loads(json.dumps(products_persist)),json_file)
+    sleep(5)    
     return jsonify({'message':'json reseteado'})
 
 @app.route("/<id_product>/<sku_variant>",methods=['GET'])
@@ -82,7 +86,9 @@ def single_variant(id_product,sku_variant):
     product = find_product_by_id(id_product)
     for variant in product['variants']:
         if variant['sku'] == sku_variant:
+            sleep(5)
             return variant
+    sleep(5)   
     return Response(response='NOT FOUND',status=404)  
     
 
